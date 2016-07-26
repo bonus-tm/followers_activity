@@ -1,0 +1,8 @@
+each post in data
+    div(style='clear:both')
+        //h3= post.caption.text
+        div
+            img(src=post.images.thumbnail.url, style='float:left;margin:.5em')
+            p Likes: #{post.likes.count}
+            p Comments: #{post.comments.count}
+    hr(style='clear:both')

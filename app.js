@@ -145,6 +145,29 @@ app.get('/api/auth', function (req, res, next) {
     }
 });
 
+app.get('/api/recent', function (req, res, next) {
+    
+    var options = {
+        hostname: 'api.instagram.com',
+        port: 443,
+        path: '/v1/users/self/media/recent/?access_token=' + access_token,
+        method: 'GET'
+    };
+    var data = '';
+    var request = https.request(options, function (response) {
+        console.log('https requested recent media');
+        response.on('data', function (chunk) {
+            data += chunk;
+        });
+        response.on('end', function () {
+            console.log('recent media data received');
+            data = JSON.parse(data);
+            res.render('recent', data);
+        });
+    });
+    request.end();
+});
+
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
