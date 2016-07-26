@@ -1,0 +1,10 @@
+//
+   Created by btm on 21/07/16.
+extends layout
+
+block content
+  h1 Authorized
+  p token: #{access_token}
+  p user:
+  pre
+    !=JSON.stringify(user)

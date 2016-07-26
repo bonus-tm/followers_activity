@@ -1,0 +1,11 @@
+version: '2'
+
+services:
+  node-web:
+    build: .
+    container_name: fact
+    volumes:
+      # - /Volumes/polter/Projects/Ta/Followers Activity/followers_activity:/usr/src/app
+      - ~/Documents/followers_activity:/usr/src/app
+    ports:
+      - "8000:3000"
