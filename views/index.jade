@@ -1,12 +1,9 @@
 extends layout
 
 block content
-  #access_token(data-access_token=access_token)
   h1= title
   p Welcome to #{title}
-  p WTF? Yo.
-  unless access_token
+  p WTF? Yo. auth = #{auth}
+  unless auth
     p
-      a(href='https://api.instagram.com/oauth/authorize/?client_id=3cc594dd9c8a4580a66fc7138a7518c5&redirect_uri=http://localhost:8000/auth&response_type=code&scope=basic+follower_list+public_content') authorize
-
-  p access_token = #{access_token}
+      a(href=instagramLoginUrl) authorize

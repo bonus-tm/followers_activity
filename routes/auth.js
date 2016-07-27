@@ -1,18 +1,12 @@
 /**
- * Created by btm on 22/07/16.
+ * Авторизуется в инстаграме, получает токен и складывает его в куки,
+ * а потом редиректит на главную
  */
 var express = require('express');
 var router = express.Router();
 
 const querystring = require('querystring');
 const https = require('https');
-
-var counter = 0;
-var access_token = null;
-
-router.get('/test', function (req, res, next) {
-    res.render('authorized', {access_token: 'WTF', user: ['fcuk!']});
-});
 
 router.get('/', function (req, res, next) {
     if (req.query.error) {
@@ -23,8 +17,7 @@ router.get('/', function (req, res, next) {
                 error_description: req.query.error_description
             }
         });
-    } else if (counter < 5) {
-        counter++;
+    } else if (!res.locals.token) {
         var post_data = querystring.stringify({
             client_id: '3cc594dd9c8a4580a66fc7138a7518c5',
             client_secret: 'c4c58753d3e848d2baa2ccc1ee8516df',
@@ -45,20 +38,25 @@ router.get('/', function (req, res, next) {
 
         var data = '';
         var request = https.request(options, function (response) {
-            console.log('https requested');
+            console.log('https auth requested');
             response.on('data', function (chunk) {
                 data += chunk;
             });
             response.on('end', function () {
-                console.log('data received:');
-                console.log(data);
-                access_token = data.access_token;
+                console.log('auth data received');
+                data = JSON.parse(data);
+                res.cookie('token', data.access_token, {
+                    httpOnly: true,
+                    maxAge: 1 * 60 * 60 * 1000 // ms, = 1 hour
+                });
+                res.redirect('/');
             });
         });
         request.write(post_data);
         request.end();
-   }
+    } else {
+        res.redirect('/');
+    }
 });
 
 module.exports = router;
-exports.access_token = access_token;
