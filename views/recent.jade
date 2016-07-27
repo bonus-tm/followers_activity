@@ -1,8 +1,10 @@
 each post in data
-    div(style='clear:both')
-        //h3= post.caption.text
-        div
-            img(src=post.images.thumbnail.url, style='float:left;margin:.5em')
-            p Likes: #{post.likes.count}
-            p Comments: #{post.comments.count}
-    hr(style='clear:both')
+  div(style='clear:both')
+    //h3= post.caption.text
+    div
+      img(src=post.images.thumbnail.url, style='float:left;margin:.5em')
+      p Likes total: #{post.likes.count}
+      p Likes from followers: #{post.likes.followers_likes}
+      p Followers/total likes ratio: #{Math.round(post.likes.ratio*1000)/10}%
+      p Comments: #{post.comments.count}
+  hr(style='clear:both')

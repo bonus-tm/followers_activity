@@ -13,6 +13,7 @@ const https = require('https');
 
 var access_token = false;
 var user = {};
+var followers_ids = [];
 
 var app = express();
 
@@ -145,29 +146,98 @@ app.get('/api/auth', function (req, res, next) {
     }
 });
 
+
+// load self followers
 app.get('/api/recent', function (req, res, next) {
-    
-    var options = {
-        hostname: 'api.instagram.com',
-        port: 443,
-        path: '/v1/users/self/media/recent/?access_token=' + access_token,
-        method: 'GET'
-    };
-    var data = '';
-    var request = https.request(options, function (response) {
-        console.log('https requested recent media');
-        response.on('data', function (chunk) {
-            data += chunk;
-        });
-        response.on('end', function () {
+    if (followers_ids.length) {
+        next();
+    } else {
+        getInstagramJson('/v1/users/self/followed-by?access_token=' + access_token)
+            .then(function (json) {
+                console.log('followers data received');
+                followers_ids = json.data.reduce(function (prev, cur) {
+                    prev.push(cur.id);
+                    return prev;
+                }, []);
+        
+                next();
+            });
+    }
+});
+app.get('/api/recent', function (req, res, next) {
+    getInstagramJson('/v1/users/self/media/recent/?access_token=' + access_token)
+        .then(function (json) {
             console.log('recent media data received');
-            data = JSON.parse(data);
-            res.render('recent', data);
+            for (var i = 20; i > 10; i--) {
+                json.data.pop();
+            }
+
+            var getLikes = function (post, i, data) {
+                return new Promise(function (resolve, reject) {
+                    getInstagramJson('/v1/media/' + post.id + '/likes?access_token=' + access_token)
+                        .then(function (likes) {
+                            data[i].likes.followers_likes = 0;
+                            likes.data.forEach(function(user_liked){                                
+                                let index_found = followers_ids.findIndex(function(id){
+                                    return id == user_liked.id;
+                                });
+                                if (index_found !== -1) {
+                                    data[i].likes.followers_likes++;
+                                }
+                            });
+                            data[i].likes.ratio = data[i].likes.followers_likes / data[i].likes.count;
+                            data[i].likes.users = likes;
+                            resolve();
+                        });
+                });
+            };
+
+            var results = Promise.all(json.data.map(getLikes));
+
+            results.then(function () {
+                console.log('All promises resolved');
+                res.render('recent', json);
+            });
         });
-    });
-    request.end();
 });
 
+
+const getInstagramJson = function (path) {
+    // return new pending promise
+    return new Promise(function (resolve, reject) {
+        var options = {
+            hostname: 'api.instagram.com',
+            method: 'GET',
+            path: path,
+            port: 443
+        };
+        const request = https.get(options, function (response) {
+            console.log('HTTPS requested', path);
+
+            // handle http errors
+            if (response.statusCode < 200 || response.statusCode > 299) {
+                reject(new Error('Failed to load page, status code: ' + response.statusCode));
+            }
+            // temporary data holder
+            var body = [];
+            // on every content chunk, push it to the data array
+            response.on('data', function (chunk) {
+                body.push(chunk);
+            });
+            // we are done, resolve promise with those joined chunks
+            response.on('end', function () {
+                console.log('HTTPS finished', path);
+                resolve(JSON.parse(body.join('')));
+            });
+        });
+        // handle connection errors of the request
+        request.on('error', function (err) {
+            console.error('error');
+            reject(err);
+        });
+        request.end();
+    });
+};
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
