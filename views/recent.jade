@@ -1,5 +1,5 @@
 each post in data
-  .row
+  .row.instagram-media(data-media_id=post.id)
     .col-xs-2.col-xs-offset-2
       a.thumbnail(href=post.link, target='_blank')
         img(src=post.images.low_resolution.url)
@@ -12,9 +12,9 @@ each post in data
         .col-xs-10
           .percentage
             .pull-left.text-success.followers-count
-              | #{post.likes.followers_likes} followers
+              | #{post.likes.followersLikes} followers
             .pull-right.text-muted.strangers-count
-              | strangers #{post.likes.count - post.likes.followers_likes}
+              | strangers #{post.likes.count - post.likes.followersLikes}
             | #{post.likes.percent}%
           .progress
             .progress-bar.progress-bar-success(
@@ -30,9 +30,9 @@ each post in data
         .col-xs-10
           .percentage
             .pull-left.text-info.followers-count
-              | #{post.comments.followers_comments} followers
+              | #{post.comments.followersComments} followers
             .pull-right.text-muted.strangers-count
-              | strangers #{post.comments.count - post.comments.followers_comments}
+              | strangers #{post.comments.count - post.comments.followersComments}
             | #{post.comments.percent}%
           .progress
             .progress-bar(
@@ -42,3 +42,5 @@ each post in data
             style='width:#{post.comments.percent}%')
 
   .row: .col-xs-8.col-xs-offset-2: hr
+
+.text-center: #load-more.btn.btn-default Load more posts

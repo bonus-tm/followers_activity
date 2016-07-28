@@ -11,7 +11,7 @@ var api = require('./routes/api');
 const querystring = require('querystring');
 const https = require('https');
 
-const instagram = require('./funcs/instagram');
+const instagram = require('./instagram');
 
 const instagramLoginUrl = 'https://api.instagram.com/oauth/authorize/'+
     '?client_id=3cc594dd9c8a4580a66fc7138a7518c5'+
@@ -40,7 +40,7 @@ app.use('/api', api);
 
 app.get('/', function (req, res, next) {
     if (!!req.cookies.token) {
-        instagram.get('/v1/users/self', req.cookies.token)
+        instagram.get('/v1/users/self', {access_token: req.cookies.token})
             .then(function (json) {
                 res.render('index', {
                     title: 'Followers Activity',

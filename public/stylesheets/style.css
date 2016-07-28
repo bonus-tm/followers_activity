@@ -14,3 +14,10 @@
 .thumbnail {
     margin-bottom: 0;
 }
+
+#load-more {
+    margin-bottom: 2em;
+}
+#loading {
+    margin-bottom: 4em;
+}

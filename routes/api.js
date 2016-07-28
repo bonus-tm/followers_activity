@@ -5,11 +5,15 @@
 var express = require('express');
 var router = express.Router();
 
-var instagram = require('../funcs/instagram');
+var instagram = require('../instagram');
+
+// сколько постов доставать за один раз
+const perPageCount = 5;
+
 
 // load self followers
-router.get('/followers_ids', function (req, res, next) {
-    instagram.get('/v1/users/self/followed-by', req.cookies.token)
+router.get('/followersIds', function (req, res, next) {
+    instagram.get('/v1/users/self/followed-by', {access_token: req.cookies.token})
         .then(function (json) {
             console.log('followers data received');
             var followers_ids = json.data.reduce(function (prev, cur) {
@@ -23,36 +27,43 @@ router.get('/followers_ids', function (req, res, next) {
 
 // load recent media
 router.post('/recent', function (req, res, next) {
-    console.log('post data:', req.body, typeof req.body);
+    console.log('post data:', req.body);
+    var param = {
+        access_token: req.cookies.token,
+        count: perPageCount
+    }
+    if (!!req.body.earliestMediaId) {
+        param.max_id = req.body.earliestMediaId;
+    }
 
-    instagram.get('/v1/users/self/media/recent/', req.cookies.token)
+    instagram.get('/v1/users/self/media/recent/', param)
         .then(function (json) {
             console.log('recent media data received');
 
-            for (var i = 20; i > 4; i--) {
-                json.data.pop();
-            }
+            // for (var i = 20; i > 4; i--) {
+            //     json.data.pop();
+            // }
 
 
             var getLikes = function (post, i, data) {
                 return new Promise(function (resolve, reject) {
-                    instagram.get('/v1/media/' + post.id + '/likes', req.cookies.token)
+                    instagram.get('/v1/media/' + post.id + '/likes', {access_token: req.cookies.token})
                         .then(function (likes) {
-                            data[i].likes.followers_likes = 0;
+                            data[i].likes.followersLikes = 0;
                             if (req.body.length > 0) {
-                                likes.data.forEach(function (user_liked) {
-                                    var index_found = req.body.findIndex(function (id) {
-                                        return id == user_liked.id;
+                                likes.data.forEach(function (userLiked) {
+                                    var index_found = req.body.followersIds.findIndex(function (id) {
+                                        return id == userLiked.id;
                                     });
                                     if (index_found !== -1) {
-                                        data[i].likes.followers_likes++;
+                                        data[i].likes.followersLikes++;
                                     }
                                 });
                             }
                             // TODO: remove for debug only
-                            data[i].likes.followers_likes = Math.floor(Math.random() * data[i].likes.count);
+                            data[i].likes.followersLikes = Math.floor(Math.random() * data[i].likes.count);
 
-                            data[i].likes.ratio = data[i].likes.followers_likes / data[i].likes.count;
+                            data[i].likes.ratio = data[i].likes.followersLikes / data[i].likes.count;
                             data[i].likes.percent = Math.round(post.likes.ratio * 1000) / 10;
                             data[i].likes.users = likes;
                             resolve();
@@ -61,23 +72,23 @@ router.post('/recent', function (req, res, next) {
             };
             var getComments = function (post, i, data) {
                 return new Promise(function (resolve, reject) {
-                    instagram.get('/v1/media/' + post.id + '/comments', req.cookies.token)
+                    instagram.get('/v1/media/' + post.id + '/comments', {access_token: req.cookies.token})
                         .then(function (comments) {
-                            data[i].comments.followers_comments = 0;
+                            data[i].comments.followersComments = 0;
                             if (req.body.length > 0) {
                                 comments.data.forEach(function (comment) {
                                     var index_found = req.body.findIndex(function (id) {
                                         return id == comment.from.id;
                                     });
                                     if (index_found !== -1) {
-                                        data[i].comments.followers_comments++;
+                                        data[i].comments.followersComments++;
                                     }
                                 });
                             }
                             // TODO: remove for debug only
-                            data[i].comments.followers_comments = Math.floor(Math.random() * data[i].comments.count);
+                            data[i].comments.followersComments = Math.floor(Math.random() * data[i].comments.count);
 
-                            data[i].comments.ratio = data[i].comments.followers_comments / data[i].comments.count;
+                            data[i].comments.ratio = data[i].comments.followersComments / data[i].comments.count;
                             data[i].comments.percent = Math.round(post.comments.ratio * 1000) / 10;
                             data[i].comments.users = comments;
                             resolve();

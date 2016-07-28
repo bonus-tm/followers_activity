@@ -1,19 +1,20 @@
 /**
  * Метод GET-запросов к API инстаграма
  */
-var https = require('https');
+const https = require('https');
+const querystring = require('querystring');
 
-exports.get = function (path, token) {
+exports.get = function (path, param) {
     // return new pending promise
     return new Promise(function (resolve, reject) {
         var options = {
             hostname: 'api.instagram.com',
             method: 'GET',
-            path: path + '?access_token=' + token,
+            path: path + '?' + querystring.stringify(param),
             port: 443
         };
         const request = https.get(options, function (response) {
-            console.log('HTTPS requested', path);
+            console.log('HTTPS requested', path + '?' + querystring.stringify(param));
 
             // handle http errors
             if (response.statusCode < 200 || response.statusCode > 299) {

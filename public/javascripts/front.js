@@ -2,7 +2,7 @@
  * Created by btm on 25/07/16.
  */
 var auth = false;
-var followers_ids = [];
+var Factive = null;
 var $content = null;
 
 $(function () {
@@ -11,28 +11,42 @@ $(function () {
 
 
     if (auth) {
-        if (localStorage.followers_ids) {
-            followers_ids = JSON.parse(localStorage.followers_ids);
+        if (localStorage.Factive) {
+            Factive = JSON.parse(localStorage.Factive);
         } else {
-            console.log('has to load followers_ids');
-            $.get('/api/followers_ids', function (json) {
-                followers_ids = json;
-                localStorage.followers_ids = JSON.stringify(followers_ids);
-                console.log('followers_ids loaded');
+            Factive = {};
+            console.log('has to load followersIds');
+            $.get('/api/followersIds', function (json) {
+                Factive.followersIds = json;
+                localStorage.Factive = JSON.stringify(Factive);
+                console.log('followersIds loaded');
             });
         }
-        console.log('followers_ids', followers_ids);
-
-
-        $.ajax('/api/recent', {
-            data: JSON.stringify(followers_ids),
-            method: 'POST',
-            contentType: 'application/json',
-            timeout: 30 * 1000,
-            success: function (html) {
-                $('#loading').remove();
-                $content.append(html);
-            }
-        });
+        console.log('followersIds', Factive.followersIds);
+        
+        loadMore();
     }
+
+    $(document).on('click', '#load-more', loadMore);
 });
+
+function loadMore() {
+    $('#load-more').remove();
+    $content.append('<div id="loading" class="text-center">Loading data from Instagram, please wait a second...</div>');
+
+    var lastMedia = $('.instagram-media:last');
+    if (lastMedia.length) {
+        Factive.earliestMediaId = $('.instagram-media:last').data('media_id');
+    }
+
+    $.ajax('/api/recent', {
+        data: JSON.stringify(Factive),
+        method: 'POST',
+        contentType: 'application/json',
+        timeout: 30 * 1000,
+        success: function (html) {
+            $('#loading').remove();
+            $content.append(html);
+        }
+    });
+}
