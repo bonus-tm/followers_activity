@@ -58,6 +58,10 @@ app.get('/', function (req, res, next) {
     }
 });
 
+app.get('/privacy-policy', function (req, res, next) {
+    res.render('privacy', {title: 'Followers Activity’s Privacy Policy'});
+});
+
 app.get('/logout', function (req, res, next) {
     res.clearCookie('token', {httpOnly: true});
     res.redirect('/');

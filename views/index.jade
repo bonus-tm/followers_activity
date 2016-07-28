@@ -8,16 +8,16 @@ block navbar
           img.img-circle.pull-left(src=user.profile_picture, alt=user.username, width='20', height='20')
           | &nbsp;#{user.username}
         ul.nav.navbar-nav
-          li
-            a(href='')
-              strong #{user.counts.followed_by} followers
+          li: a(href=''): strong #{user.counts.followed_by} followers
         ul.nav.navbar-nav.navbar-right
-          li
-            a(href='/logout') Exit
+          li: a(href='/privacy-policy') Privacy Policy
+          li: a(href='/logout') Exit
 
 block content
   unless auth
     .text-center
       h1= title
+      p: a.btn.btn-lg.btn-info(href=instagramLoginUrl) Login
       br
-      a.btn.btn-lg.btn-info(href=instagramLoginUrl) Login
+      br
+      p: a(href='/privacy-policy') Privacy Policy

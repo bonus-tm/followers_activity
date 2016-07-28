@@ -3,7 +3,9 @@
 extends layout
 
 block content
-  h1 Auth failed
-  p reasons:
-  pre
-    !=JSON.stringify(error)
+  .text-center
+    h1 Login failed, sorry
+    p: a(href='/') Return to main page
+    br
+    br
+    p: a(href='/privacy-policy') Privacy Policy
