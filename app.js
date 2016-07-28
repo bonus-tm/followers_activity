@@ -11,6 +11,8 @@ var api = require('./routes/api');
 const querystring = require('querystring');
 const https = require('https');
 
+const instagram = require('./funcs/instagram');
+
 const instagramLoginUrl = 'https://api.instagram.com/oauth/authorize/'+
     '?client_id=3cc594dd9c8a4580a66fc7138a7518c5'+
     '&redirect_uri=http://localhost:8000/auth'+
@@ -37,14 +39,29 @@ app.use('/auth', auth);
 app.use('/api', api);
 
 app.get('/', function (req, res, next) {
-    console.log('cookie:', req.cookies.token);
-    res.render('index', {
-        title: 'Express',
-        auth: !!req.cookies.token,
-        instagramLoginUrl: instagramLoginUrl
-    });
+    if (!!req.cookies.token) {
+        instagram.get('/v1/users/self', req.cookies.token)
+            .then(function (json) {
+                res.render('index', {
+                    title: 'Followers Activity',
+                    auth: true,
+                    instagramLoginUrl: instagramLoginUrl,
+                    user: json.data
+                });
+            });
+    } else {
+        res.render('index', {
+            title: 'Followers Activity',
+            auth: false,
+            instagramLoginUrl: instagramLoginUrl
+        });
+    }
 });
 
+app.get('/logout', function (req, res, next) {
+    res.clearCookie('token', {httpOnly: true});
+    res.redirect('/');
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

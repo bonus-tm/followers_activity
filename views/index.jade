@@ -1,9 +1,25 @@
 extends layout
 
+block navbar
+  if auth
+    nav.navbar.navbar-default
+      .container-fluid
+        a.navbar-brand(href='')
+          img.img-circle.pull-left(src=user.profile_picture, alt=user.username, width='20', height='20')
+          | &nbsp;#{user.username}
+        ul.nav.navbar-nav
+          li
+            a(href='')
+              strong #{user.counts.followed_by} followers
+        ul.nav.navbar-nav.navbar-right
+          li
+            a(href='/logout') Exit
+
 block content
-  h1= title
-  p Welcome to #{title}
-  p WTF? Yo. auth = #{auth}
-  unless auth
-    p
-      a(href=instagramLoginUrl) authorize
+  .text-center
+    if auth
+      #loading Loading data from Instagram, please wait a second...
+    else
+      h1= title
+      br
+      a.btn.btn-lg.btn-info(href=instagramLoginUrl) Login

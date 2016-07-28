@@ -3,16 +3,14 @@
  */
 var auth = false;
 var followers_ids = [];
+var $content = null;
 
 $(function () {
     auth = $('body').data('auth');
+    $content = $('.content');
 
 
-    if (!auth) {
-        $('body').append('<div id="auth">Need to authorize...</div>');
-    } else {
-        $('body').append('<div>Yay! We\'ve got access!</div>');
-
+    if (auth) {
         if (localStorage.followers_ids) {
             followers_ids = JSON.parse(localStorage.followers_ids);
         } else {
@@ -24,7 +22,7 @@ $(function () {
             });
         }
         console.log('followers_ids', followers_ids);
-        
+
 
         $.ajax('/api/recent', {
             data: JSON.stringify(followers_ids),
@@ -32,7 +30,8 @@ $(function () {
             contentType: 'application/json',
             timeout: 30 * 1000,
             success: function (html) {
-                $('body').append(html);
+                $('#loading').remove();
+                $content.append(html);
             }
         });
     }

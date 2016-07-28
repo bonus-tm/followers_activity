@@ -1,10 +1,44 @@
 each post in data
-  div(style='clear:both')
-    //h3= post.caption.text
-    div
-      img(src=post.images.thumbnail.url, style='float:left;margin:.5em')
-      p Likes total: #{post.likes.count}
-      p Likes from followers: #{post.likes.followers_likes}
-      p Followers/total likes ratio: #{Math.round(post.likes.ratio*1000)/10}%
-      p Comments: #{post.comments.count}
-  hr(style='clear:both')
+  .row
+    .col-xs-2.col-xs-offset-2
+      a.thumbnail(href=post.link, target='_blank')
+        img(src=post.images.low_resolution.url)
+
+    .col-xs-6
+      .row
+        .col-xs-2.text-center
+          div Likes
+          .total-count= post.likes.count
+        .col-xs-10
+          .percentage
+            .pull-left.text-success.followers-count
+              | #{post.likes.followers_likes} followers
+            .pull-right.text-muted.strangers-count
+              | strangers #{post.likes.count - post.likes.followers_likes}
+            | #{post.likes.percent}%
+          .progress
+            .progress-bar.progress-bar-success(
+            aria-valuemin=0,
+            aria-valuemax=100,
+            aria-valuenow=post.likes.percent,
+            style='width:#{post.likes.percent}%')
+
+      .row
+        .col-xs-2.text-center
+          div Comments
+          .total-count= post.comments.count
+        .col-xs-10
+          .percentage
+            .pull-left.text-info.followers-count
+              | #{post.comments.followers_comments} followers
+            .pull-right.text-muted.strangers-count
+              | strangers #{post.comments.count - post.comments.followers_comments}
+            | #{post.comments.percent}%
+          .progress
+            .progress-bar(
+            aria-valuemin=0,
+            aria-valuemax=100,
+            aria-valuenow=post.comments.percent,
+            style='width:#{post.comments.percent}%')
+
+  .row: .col-xs-8.col-xs-offset-2: hr
