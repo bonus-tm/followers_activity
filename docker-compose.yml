@@ -2,7 +2,8 @@ version: '2'
 
 services:
   node-web:
-    build: .
+#    build: .
+    image: bonustm/followers-activity:latest
     container_name: fact
     volumes:
        - /Volumes/polter/Projects/Ta/Followers Activity/followers_activity:/usr/src/app
