@@ -16,14 +16,13 @@ block navbar
 block content
   unless auth
     br
-    br
-    .row.hidden-xs
-      .col-sm-5.text-right
+    .row.hidden-xs.hidden-sm
+      .col-md-5.text-right
         img(src='fa.png', style='width:128px;height:128px')
-      .col-sm-7
+      .col-md-7
         h1(style='margin-top:28px')= title
 
-    .row.visible-xs-block
+    .row.visible-xs-block.visible-sm-block
       .col-xs-12.text-center
         img(src='fa.png', style='width:128px;height:128px')
       .col-xs-12.text-center
@@ -31,7 +30,7 @@ block content
 
     br
     .row
-      .col-sm-6.col-sm-offset-3
+      .col-md-6.col-md-offset-3
         p.text-center.text-muted.
           This simple web app will let you find out proportion of followers and strangers among those,
           who liked and commented your posts.

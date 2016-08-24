@@ -7,9 +7,13 @@
     font-size: 14px;
 }
 .total-count {
-    font-size: 26px;
-    font-weight: bold;
-    line-height: 1.2;
+    font-size: 18px;
+    line-height: 1.5;
+    text-align: right;
+}
+.total-count > strong {
+    font-size: 110%;
+    margin-left: .2em;
 }
 .thumbnail {
     margin-bottom: 0;

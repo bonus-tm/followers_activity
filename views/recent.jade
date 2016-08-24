@@ -1,15 +1,14 @@
 each post in data
   .row.instagram-media(data-media_id=post.id)
-    .col-xs-2.col-xs-offset-2
+    .col-lg-2.col-lg-offset-2.col-md-3.col-md-offset-0.col-sm-4.col-sm-offset-0.col-xs-6.col-xs-offset-3
       a.thumbnail(href=post.link, target='_blank')
         img(src=post.images.low_resolution.url)
 
-    .col-xs-6
+    .col-lg-6.col-md-9.col-sm-8
       .row
-        .col-xs-2.text-center
-          div Likes
-          .total-count= post.likes.count
-        .col-xs-10
+        .col-xs-12
+          div.total-count Total likes:
+            strong= post.likes.count
           .percentage
             .pull-left.text-success.followers-count
               | #{post.likes.followersLikes} followers
@@ -24,10 +23,9 @@ each post in data
             style='width:#{post.likes.percent}%')
 
       .row
-        .col-xs-2.text-center
-          div Comments
-          .total-count= post.comments.count
-        .col-xs-10
+        .col-xs-12
+          div.total-count Total comments:
+            strong= post.comments.count
           .percentage
             .pull-left.text-info.followers-count
               | #{post.comments.followersComments} followers
@@ -41,6 +39,7 @@ each post in data
             aria-valuenow=post.comments.percent,
             style='width:#{post.comments.percent}%')
 
-  .row: .col-xs-8.col-xs-offset-2: hr
+
+  .row: .col-lg-8.col-lg-offset-2.col-md-12.col-md-offset-0: hr
 
 .text-center: #load-more.btn.btn-default Load more posts
