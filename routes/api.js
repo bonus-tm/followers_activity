@@ -31,7 +31,7 @@ router.post('/recent', function (req, res, next) {
     var param = {
         access_token: req.cookies.token,
         count: perPageCount
-    }
+    };
     if (!!req.body.earliestMediaId) {
         param.max_id = req.body.earliestMediaId;
     }
@@ -50,22 +50,28 @@ router.post('/recent', function (req, res, next) {
                     instagram.get('/v1/media/' + post.id + '/likes', {access_token: req.cookies.token})
                         .then(function (likes) {
                             data[i].likes.followersLikes = 0;
-                            if (req.body.length > 0) {
-                                likes.data.forEach(function (userLiked) {
-                                    var index_found = req.body.followersIds.findIndex(function (id) {
-                                        return id == userLiked.id;
-                                    });
-                                    if (index_found !== -1) {
-                                        data[i].likes.followersLikes++;
-                                    }
-                                });
-                            }
-                            // TODO: remove for debug only
-                            data[i].likes.followersLikes = Math.floor(Math.random() * data[i].likes.count);
+                            data[i].likes.ratio = 0;
+                            data[i].likes.percent = 0;
+                            data[i].likes.users = 0;
 
-                            data[i].likes.ratio = data[i].likes.followersLikes / data[i].likes.count;
-                            data[i].likes.percent = Math.round(post.likes.ratio * 1000) / 10;
-                            data[i].likes.users = likes;
+                            if (data[i].likes.count > 0) {
+                                if (req.body.length > 0) {
+                                    likes.data.forEach(function (userLiked) {
+                                        var index_found = req.body.followersIds.findIndex(function (id) {
+                                            return id == userLiked.id;
+                                        });
+                                        if (index_found !== -1) {
+                                            data[i].likes.followersLikes++;
+                                        }
+                                    });
+                                }
+                                // TODO: remove for debug only
+                                data[i].likes.followersLikes = Math.floor(Math.random() * data[i].likes.count);
+
+                                data[i].likes.ratio = data[i].likes.followersLikes / data[i].likes.count;
+                                data[i].likes.percent = Math.round(post.likes.ratio * 1000) / 10;
+                                data[i].likes.users = likes;
+                            }
                             resolve();
                         });
                 });
@@ -75,22 +81,28 @@ router.post('/recent', function (req, res, next) {
                     instagram.get('/v1/media/' + post.id + '/comments', {access_token: req.cookies.token})
                         .then(function (comments) {
                             data[i].comments.followersComments = 0;
-                            if (req.body.length > 0) {
-                                comments.data.forEach(function (comment) {
-                                    var index_found = req.body.findIndex(function (id) {
-                                        return id == comment.from.id;
-                                    });
-                                    if (index_found !== -1) {
-                                        data[i].comments.followersComments++;
-                                    }
-                                });
-                            }
-                            // TODO: remove for debug only
-                            data[i].comments.followersComments = Math.floor(Math.random() * data[i].comments.count);
+                            data[i].comments.ratio = 0;
+                            data[i].comments.percent = 0;
+                            data[i].comments.users = 0;
 
-                            data[i].comments.ratio = data[i].comments.followersComments / data[i].comments.count;
-                            data[i].comments.percent = Math.round(post.comments.ratio * 1000) / 10;
-                            data[i].comments.users = comments;
+                            if (data[i].comments.count > 0) {
+                                if (req.body.length > 0) {
+                                    comments.data.forEach(function (comment) {
+                                        var index_found = req.body.findIndex(function (id) {
+                                            return id == comment.from.id;
+                                        });
+                                        if (index_found !== -1) {
+                                            data[i].comments.followersComments++;
+                                        }
+                                    });
+                                }
+                                // TODO: remove for debug only
+                                data[i].comments.followersComments = Math.floor(Math.random() * data[i].comments.count);
+
+                                data[i].comments.ratio = data[i].comments.followersComments / data[i].comments.count;
+                                data[i].comments.percent = Math.round(post.comments.ratio * 1000) / 10;
+                                data[i].comments.users = comments;
+                            }
                             resolve();
                         });
                 });

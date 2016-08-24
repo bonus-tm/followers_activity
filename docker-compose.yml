@@ -2,7 +2,7 @@ version: '2'
 
 services:
   node-web:
-#    build: .
+    build: .
     image: bonustm/followers-activity:latest
     container_name: fact
     volumes:
