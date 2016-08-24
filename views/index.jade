@@ -15,9 +15,32 @@ block navbar
 
 block content
   unless auth
-    .text-center
-      h1= title
-      p: a.btn.btn-lg.btn-info(href=instagramLoginUrl) Login
-      br
-      br
-      p: a(href='/privacy-policy') Privacy Policy
+    br
+    br
+    .row.hidden-xs
+      .col-sm-5.text-right
+        img(src='fa.png', style='width:128px;height:128px')
+      .col-sm-7
+        h1(style='margin-top:28px')= title
+
+    .row.visible-xs-block
+      .col-xs-12.text-center
+        img(src='fa.png', style='width:128px;height:128px')
+      .col-xs-12.text-center
+        h1= title
+
+    br
+    .row
+      .col-sm-6.col-sm-offset-3
+        p.text-center.text-muted.
+          This simple web app will let you find out proportion of followers and strangers among those,
+          who liked and commented your posts.
+    .row
+      .col-xs-12
+        .text-center
+          br
+          br
+          p: a.btn.btn-lg.btn-info(href=instagramLoginUrl) Login with Instagram
+          br
+          br
+          p: a(href='/privacy-policy') Privacy Policy
