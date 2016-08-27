@@ -42,8 +42,18 @@ app.get('/', function (req, res, next) {
     if (!!req.cookies.token) {
         instagram.get('/v1/users/self', {access_token: req.cookies.token})
             .then(function (json) {
+                
+                // hunamize followers counter
+                var flwrs = json.data.counts.followed_by;
+                json.data.counts.followed_by_human = flwrs;
+                if (flwrs > 1000000) {
+                    json.data.counts.followed_by_human = Math.round(flwrs / 1000000) + 'M';
+                } else if (flwrs > 1000) {
+                    json.data.counts.followed_by_human = Math.round(flwrs / 1000) + 'k';
+                }
+                
                 res.render('index', {
-                    title: 'Followers Activity',
+                    title: json.data.username + ' — Followers Activity',
                     auth: true,
                     instagramLoginUrl: instagramLoginUrl,
                     user: json.data
