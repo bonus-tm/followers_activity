@@ -14,8 +14,6 @@ exports.get = function (path, param) {
             port: 443
         };
         const request = https.get(options, function (response) {
-            console.log('HTTPS requested', path + '?' + querystring.stringify(param));
-
             // handle http errors
             if (response.statusCode < 200 || response.statusCode > 299) {
                 reject(new Error('Failed to load page, status code: ' + response.statusCode));
@@ -28,7 +26,6 @@ exports.get = function (path, param) {
             });
             // we are done, resolve promise with those joined chunks
             response.on('end', function () {
-                console.log('HTTPS finished', path);
                 resolve(JSON.parse(body.join('')));
             });
         });

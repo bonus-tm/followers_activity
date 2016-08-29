@@ -15,7 +15,6 @@ const perPageCount = 5;
 router.get('/followersIds', function (req, res, next) {
     instagram.get('/v1/users/self/followed-by', {access_token: req.cookies.token})
         .then(function (json) {
-            console.log('followers data received');
             var followers_ids = json.data.reduce(function (prev, cur) {
                 prev.push(cur.id * 1);
                 return prev;
@@ -27,7 +26,6 @@ router.get('/followersIds', function (req, res, next) {
 
 // load recent media
 router.post('/recent', function (req, res, next) {
-    console.log('post data:', req.body);
     var param = {
         access_token: req.cookies.token,
         count: perPageCount
@@ -38,13 +36,6 @@ router.post('/recent', function (req, res, next) {
 
     instagram.get('/v1/users/self/media/recent/', param)
         .then(function (json) {
-            console.log('recent media data received');
-
-            // for (var i = 20; i > 4; i--) {
-            //     json.data.pop();
-            // }
-
-
             var getLikes = function (post, i, data) {
                 return new Promise(function (resolve, reject) {
                     instagram.get('/v1/media/' + post.id + '/likes', {access_token: req.cookies.token})
@@ -55,7 +46,7 @@ router.post('/recent', function (req, res, next) {
                             data[i].likes.users = 0;
 
                             if (data[i].likes.count > 0) {
-                                if (req.body.length > 0) {
+                                if (typeof req.body.followersIds !== "undefined" && req.body.followersIds.length > 0) {
                                     likes.data.forEach(function (userLiked) {
                                         var index_found = req.body.followersIds.findIndex(function (id) {
                                             return id == userLiked.id;
@@ -65,9 +56,6 @@ router.post('/recent', function (req, res, next) {
                                         }
                                     });
                                 }
-                                // TODO: remove for debug only
-                                data[i].likes.followersLikes = Math.floor(Math.random() * data[i].likes.count);
-
                                 data[i].likes.ratio = data[i].likes.followersLikes / data[i].likes.count;
                                 data[i].likes.percent = Math.round(post.likes.ratio * 1000) / 10;
                                 data[i].likes.users = likes;
@@ -86,7 +74,7 @@ router.post('/recent', function (req, res, next) {
                             data[i].comments.users = 0;
 
                             if (data[i].comments.count > 0) {
-                                if (req.body.length > 0) {
+                                if (typeof req.body.followersIds !== "undefined" && req.body.followersIds.length > 0) {
                                     comments.data.forEach(function (comment) {
                                         var index_found = req.body.findIndex(function (id) {
                                             return id == comment.from.id;
@@ -96,9 +84,6 @@ router.post('/recent', function (req, res, next) {
                                         }
                                     });
                                 }
-                                // TODO: remove for debug only
-                                data[i].comments.followersComments = Math.floor(Math.random() * data[i].comments.count);
-
                                 data[i].comments.ratio = data[i].comments.followersComments / data[i].comments.count;
                                 data[i].comments.percent = Math.round(post.comments.ratio * 1000) / 10;
                                 data[i].comments.users = comments;
@@ -113,7 +98,6 @@ router.post('/recent', function (req, res, next) {
             );
 
             results.then(function () {
-                console.log('All promises resolved');
                 res.render('recent', json);
             }).catch(function (err) {
                 console.error(err);

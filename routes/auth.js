@@ -38,12 +38,10 @@ router.get('/', function (req, res, next) {
 
         var data = '';
         var request = https.request(options, function (response) {
-            console.log('https auth requested');
             response.on('data', function (chunk) {
                 data += chunk;
             });
             response.on('end', function () {
-                console.log('auth data received');
                 data = JSON.parse(data);
                 res.cookie('token', data.access_token, {
                     httpOnly: true,
