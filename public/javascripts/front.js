@@ -2,34 +2,44 @@
  * Created by btm on 25/07/16.
  */
 var auth = false;
-var Factive = null;
+var Factive = {};
 var $content = null;
+
+var followersIdsUpdateInterval = 60 * 60 * 1000; // 1 hour
 
 $(function () {
     auth = $('body').data('auth');
     $content = $('.content');
-    
-    if (auth) {
-        if (localStorage.Factive) {
-            Factive = JSON.parse(localStorage.Factive);
-        } else {
-            Factive = {};
-            console.log('has to load followersIds');
-            $.get('/api/followersIds', function (json) {
-                Factive.followersIds = json;
-                localStorage.Factive = JSON.stringify(Factive);
-                console.log('followersIds loaded');
-            });
-        }
-        console.log('followersIds', Factive.followersIds);
 
-        loadMore();
+    if (auth) {
+        var init = new Promise(function (resolve, reject) {
+            if (localStorage.Factive) {
+                Factive = JSON.parse(localStorage.Factive);
+            }
+
+            if (Factive && Factive.updated && Factive.updated < Date.now() + followersIdsUpdateInterval) {
+                resolve();
+            } else {
+                $.ajax('/api/followersIds', {
+                    method: 'GET',
+                    contentType: 'application/json',
+                    timeout: 30 * 1000
+                }).then(function (json) {
+                    Factive.followersIds = json;
+                    Factive.updated = Date.now();
+                    localStorage.Factive = JSON.stringify(Factive);
+                    resolve();
+                });
+            }
+        });
+
+        init.then(loadPosts);
     }
 
-    $(document).on('click', '#load-more', loadMore);
+    $(document).on('click', '#load-more', loadPosts);
 });
 
-function loadMore() {
+function loadPosts() {
     $('#load-more').remove();
     $content.append('<div id="loading" class="text-center text-muted">' +
         'Loading data from Instagram, please wait a&nbsp;moment...' +

@@ -45,7 +45,7 @@ router.get('/', function (req, res, next) {
                 data = JSON.parse(data);
                 res.cookie('token', data.access_token, {
                     httpOnly: true,
-                    maxAge: 1 * 60 * 60 * 1000 // ms, = 1 hour
+                    maxAge: 24 * 60 * 60 * 1000 // in ms, = 24 hour
                 });
                 res.redirect('/');
             });
