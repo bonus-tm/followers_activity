@@ -6,6 +6,14 @@ var Factive = {};
 var $content = null;
 
 var followersIdsUpdateInterval = 60 * 60 * 1000; // 1 hour
+var loadingMessage = '<div id="loading" class="text-center text-muted">' +
+    '<div class="spinner">' +
+    '<div class="bounce1"></div>' +
+    '<div class="bounce2"></div>' +
+    '<div class="bounce3"></div>' +
+    '</div>' +
+    '<p>Loading data from Instagram, please wait a&nbsp;moment...</p>' +
+    '</div>';
 
 $(function () {
     auth = $('body').data('auth');
@@ -13,13 +21,12 @@ $(function () {
 
     if (auth) {
         var init = new Promise(function (resolve, reject) {
-            if (localStorage.Factive) {
-                Factive = JSON.parse(localStorage.Factive);
-            }
+            Factive = JSON.parse(localStorage.getItem('Factive')) || {};
 
             if (Factive && Factive.updated && Factive.updated < Date.now() + followersIdsUpdateInterval) {
                 resolve();
             } else {
+                $content.append(loadingMessage);
                 $.ajax('/api/followersIds', {
                     method: 'GET',
                     contentType: 'application/json',
@@ -27,7 +34,7 @@ $(function () {
                 }).then(function (json) {
                     Factive.followersIds = json;
                     Factive.updated = Date.now();
-                    localStorage.Factive = JSON.stringify(Factive);
+                    localStorage.setItem('Factive', JSON.stringify(Factive));
                     resolve();
                 });
             }
@@ -40,10 +47,8 @@ $(function () {
 });
 
 function loadPosts() {
-    $('#load-more').remove();
-    $content.append('<div id="loading" class="text-center text-muted">' +
-        'Loading data from Instagram, please wait a&nbsp;moment...' +
-        '</div>');
+    $('#load-more, #loading').remove();
+    $content.append(loadingMessage);
 
     var lastMedia = $('.instagram-media:last');
     if (lastMedia.length) {
